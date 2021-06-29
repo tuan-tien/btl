@@ -46,12 +46,15 @@ struct dsdgListOut {
 	int outDate;
 	dsdgListOut* next;
 };
-
+struct arrList {
+	int data;
+	struct arrList* next;
+};
 
 int choice();
-void readerHandle(dsdg* &readerTree);
+void readerHandle(dsdg* &readerTree, arrList* codeDg);
 void printReader(dsdg* readerTree);
-void inputBookHeader(bookHeader** &bookHeaderList, int &n);
+void inputBookHeader(bookHeader** &bookHeaderList, int &n, arrList* );
 void printBookHeaderNameInc(bookHeader** bookHeaderList, int n);
 void findBookByName(bookHeader** bookHeaderList, int n);
 void BorrowBook(dsdg* readerTree, bookHeader** bookHeaderList, int n);
@@ -59,18 +62,18 @@ void giveBookBack(dsdg* readerTree, bookHeader** bookHeaderList, int n);
 void printBookBorrowing(dsdg* readerTree, bookHeader** bookHeaderList, int n);
 void printOutOfDateReader(dsdg* readerTree);
 void printTop10Book(dsdg* readerTree, bookHeader** bookHeaderList, int n);
-void inputReader(dsdg* &readerTree);
-dsdg* createReaderNode();
+void inputReader(dsdg* &readerTree, arrList* codeDg);
+dsdg* createReaderNode(arrList* codeDg);
 void insertReaderNode(dsdg*&, dsdg*);
-void deleteReader(dsdg* &readerTree, int ma);
-void editReader(dsdg* &readerTree, int ma);
+void deleteReader(dsdg* &readerTree, int ma, arrList* );
+void editReader(dsdg* &readerTree, int ma, arrList* codeDg);
 void printReaderLNR(dsdg* readerTree);
 void makeListFromTree(dsdg*, dsdgList*&);
 void makeListFromTree2(dsdg* readerTree, dsdgListOut*& lst, date);
 int compareString(char*, char*);
 void insertList(dsdg* tree, dsdgList*& list);
 void insertList2(dsdg* tree, dsdgListOut*& list, date);
-bookIndex* createBookIndex();
+bookIndex* createBookIndex(arrList* codeBook);
 dsdg* findReader(dsdg* readerTree, char* ten);
 bookHeader* findBook(bookHeader** bookHeaderList, int n, int ma);
 date nhapDate();
@@ -80,8 +83,15 @@ int operator-(date d1, date d2);
 date operator+(date d1, int n);
 date operator+(int n, date d1);
 void sumTop10(dsdg* readerTree, bookHeader** bookHeaderList, int n, int* arr);
+int compareTenHo(dsdg* , dsdg* );
+void insert(arrList* &first, arrList* nod);
+arrList* createNode(int n = 0);
+int findElement(arrList* first, int n = 0);
+void deleteElement(arrList* &first, int n = 0);
 
 int main() {
+	arrList* codeBook = NULL;
+	arrList* codeDg = NULL;
 	bookHeader** bookHeaderList = NULL;
 	int n = 0;
 	dsdg* readerTree = NULL;
@@ -91,13 +101,13 @@ int main() {
 		switch (choose)
 		{
 		case 1: 
-			readerHandle(readerTree);
+			readerHandle(readerTree, codeDg);
 			break;
 		case 2:
 			printReader(readerTree);
 			break;
 		case 3:
-			inputBookHeader(bookHeaderList,n);
+			inputBookHeader(bookHeaderList,n, codeBook);
 			break;
 		case 4:
 			printBookHeaderNameInc(bookHeaderList,n);
@@ -147,7 +157,7 @@ int choice() {
 	}
 	return n;
 }
-void readerHandle(dsdg*& readerTree) {
+void readerHandle(dsdg*& readerTree, arrList* codeDg) {
 	cout << "\n1) nhap doc gia";
 	cout << "\n2) xoa doc gia";
 	cout << "\n3) sua thong tin doc gia";
@@ -162,26 +172,30 @@ void readerHandle(dsdg*& readerTree) {
 	}
 	switch (n) {
 	case 1:
-		inputReader(readerTree);
+		inputReader(readerTree, codeDg);
 		break;
 	case 2:
-		deleteReader(readerTree, ma);
+		deleteReader(readerTree, ma, codeDg);
 		break;
 	case 3:
-		editReader(readerTree, ma);
+		editReader(readerTree, ma, codeDg);
 		break;
 	}
 }
-void inputReader(dsdg* &readerTree) {
+void inputReader(dsdg* &readerTree, arrList* codeDg) {
 	int n;
 	cout << "\nnhap so luong doc gia: "; cin >> n;
 	for (int i = 0; i < n; i++) {
-		insertReaderNode(readerTree, createReaderNode());
+		insertReaderNode(readerTree, createReaderNode(codeDg));
 	}
 }
-dsdg* createReaderNode() {
+dsdg* createReaderNode(arrList* codeDg) {
 	dsdg* temp = new dsdg;
 	temp->MADG = rand() % 100001;
+	while (findElement(codeDg, temp->MADG) != -1) {
+		temp->MADG = rand() % 100001;
+	}
+	insert(codeDg,createNode(temp->MADG));
 	cout << "nhap ho: "; cin.ignore();
 	temp->ho = new char[100];
 	cin.getline(temp->ho, 100);
@@ -203,33 +217,33 @@ void insertReaderNode(dsdg*& dad, dsdg* nod) {
 		dad = nod;
 	}
 }
-void deleteReader(dsdg* &dad, int ma) {
+void deleteReader(dsdg* &dad, int ma, arrList* codeDg) {
 	if (dad) {
-		if (dad->MADG < ma) deleteReader(dad->right, ma);
-		else if (dad->MADG > ma) deleteReader(dad->left, ma);
-		else {
-			dsdg* left = dad->left, * right = dad->right;
-			delete dad;
-			if (left) {
-				dad = left;
-				insertReaderNode(dad, right);
-			}
-			else if (right) {
-				dad = right;
-			}
+		if (dad->MADG < ma) deleteReader(dad->right, ma, codeDg);
+		if (dad->MADG > ma) deleteReader(dad->left, ma, codeDg);		
+		dsdg* left = dad->left, * right = dad->right;
+		deleteElement(codeDg, dad->MADG);
+		delete dad;
+		if (left) {
+			dad = left;
+			insertReaderNode(dad, right);
 		}
+		else if (right) {
+			dad = right;
+		}
+		
 	}
 }
-void editReader(dsdg* &dad, int ma) {
+void editReader(dsdg* &dad, int ma, arrList* codeDg) {
 	if (dad) {
-		if (dad->MADG < ma) editReader(dad->right, ma);
-		else if (dad->MADG > ma) editReader(dad->left, ma);
+		if (dad->MADG < ma) editReader(dad->right, ma, codeDg);
+		else if (dad->MADG > ma) editReader(dad->left, ma, codeDg);
 		else {
 			dsdg* left = dad->left, * right = dad->right; 
 			int madg = dad->MADG; 
 			muonTra* con = dad->contro;
 			delete dad;
-			dad = createReaderNode();
+			dad = createReaderNode(codeDg);
 			dad->left = left;
 			dad->right = right;
 			dad->contro = con;
@@ -286,7 +300,7 @@ void insertList(dsdg* tree, dsdgList*& list) {
 	if (list) {
 		if (list->next)
 		{
-			if (compareString(tree->ten, list->data->ten) == 2) {
+			if (compareTenHo(tree, list->data) == 2) {
 				dsdgList* temp = new dsdgList;
 				temp->data = tree;
 				temp->next = list;
@@ -294,7 +308,7 @@ void insertList(dsdg* tree, dsdgList*& list) {
 			}
 			dsdgList* temp = list;
 			while (temp->next) {
-				if (compareString(tree->ten, temp->next->data->ten) == 2) {
+				if (compareTenHo(tree, temp->next->data) == 2) {
 					break;
 				}
 				temp = temp->next;
@@ -307,7 +321,7 @@ void insertList(dsdg* tree, dsdgList*& list) {
 		}
 		else
 		{
-			if (compareString(tree->ten, list->data->ten) == 2) {
+			if (compareTenHo(tree, list->data) == 2) {
 				dsdgList* temp = new dsdgList;
 				temp->data = tree;
 				temp->next = list;
@@ -327,6 +341,11 @@ void insertList(dsdg* tree, dsdgList*& list) {
 		list->next = NULL;
 	}
 }
+int compareTenHo(dsdg* p1, dsdg* p2) {
+	int temp = compareString(p1->ten, p2->ten);
+	if (temp != 0) return temp;
+	else return compareString(p1->ho, p2->ho);
+}
 int compareString(char* c1, char* c2) {
 	int i = 0;
 	while (c1[i] != '\0' && c2[i] != '\0') {
@@ -338,7 +357,7 @@ int compareString(char* c1, char* c2) {
 	else if (c1[i] == '\0') return 2;
 	else return 1;
 }
-void inputBookHeader(bookHeader**& bookHeaderList, int &n) {
+void inputBookHeader(bookHeader**& bookHeaderList, int &n, arrList* codeBook) {
 	cout << "nhap so luong dau sach: ";
 	cin >> n;
 	if (bookHeaderList) delete[] bookHeaderList;
@@ -354,10 +373,10 @@ void inputBookHeader(bookHeader**& bookHeaderList, int &n) {
 		cout << "nhap tac gia : "; cin.ignore(); cin.getline(bookHeaderList[i]->tacGia, 100);
 		bookHeaderList[i]->theLoai = new char[100];
 		cout << "nhap the loai: "; cin.getline(bookHeaderList[i]->theLoai, 100);
-		bookHeaderList[i]->contro = createBookIndex();
+		bookHeaderList[i]->contro = createBookIndex(codeBook);
 	}
 }
-bookIndex* createBookIndex() {
+bookIndex* createBookIndex(arrList* codeBook) {
 	cout << "nhap so luong sach: ";
 	int n;
 	cin >> n;
@@ -365,6 +384,10 @@ bookIndex* createBookIndex() {
 	for (int i = 0; i < n; i++) {
 		bookIndex* temp = new bookIndex;
 		cout << "nhap ma sach: "; cin >> temp->maSach;
+		while (findElement(codeBook, temp->maSach) != -1) {
+			cout << "nhap lai ma sach: "; cin >> temp->maSach;
+		}
+		insert(codeBook, createNode(temp->maSach));
 		cout << "nhap trang thai: "; cin >> temp->trangThai;
 		cout << "nhap vi tri: "; cin >> temp->viTri;
 		temp->next = NULL;
@@ -489,6 +512,7 @@ date operator+(date d1, int n) {
 date operator+(int n, date d1) {
 	return d1 + n;
 }
+
 date nhapDate() {
 	date temp;
 	cout << "\nnhap ngay: "; cin >> temp.day;
@@ -651,6 +675,9 @@ void insertList2(dsdg* tree, dsdgListOut*& list, date curr) {
 date findmaxOut(dsdg* tree) {
 	int ini = 0;
 	date max;
+	max.day = 0;
+	max.month = 0;
+	max.year = 0;
 	muonTra * temp = tree->contro;
 	while (temp) {
 		if (temp->trangThai == 0) {
@@ -710,5 +737,46 @@ void sumTop10(dsdg* readerTree, bookHeader** bookHeaderList, int n, int* arr) {
 			temp = temp->next;
 		}
 		sumTop10(readerTree->right, bookHeaderList, n, arr);
+	}
+}
+void insert(arrList* &first, arrList* nod) {
+	nod->next = first;
+	first = nod;
+}
+arrList* createNode(int n = 0) {
+	arrList* temp = new arrList;
+	temp->data = n;
+	temp->next = NULL;
+	return temp;
+}
+int findElement(arrList* first, int n = 0) {
+	if (!first) return -1;
+	else {
+		int n = 0;
+		arrList* temp = first;
+		while (temp) {
+			if (temp->data == n) return n;
+			temp = temp->next;
+			n++;
+		}
+		return -1;
+	}
+}
+void deleteElement(arrList* &first, int n = 0) {
+	int pos = findElement(first, n);
+	if (pos != -1) {
+		arrList* temp = first;
+		if (!pos) {			
+			first = first->next;
+			delete temp;
+		}
+		else {
+			for (int i = 0; i < n-1; i++) {
+				temp = temp->next;
+			}
+			arrList* temp2 = temp->next;
+			temp->next = temp2->next;
+			delete temp2;
+		}
 	}
 }

@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\minht\source\repos\thi\thi\main.cpp(568): warning C4715: 'findBook': not all control paths return a value
+  thi.vcxproj -> C:\Users\minht\source\repos\thi\Debug\thi.exe
