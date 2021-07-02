@@ -14,4 +14,9 @@ struct bookHeader {
 };
 void inputBookHeader(bookHeader**& bookHeaderList, int& n, arrList*);
 void printBookHeaderNameInc(bookHeader** bookHeaderList, int n);
-bookHeader* findBook(bookHeader** bookHeaderList, int n, int ma);
+int findBook(bookHeader** bookHeaderList, int n, int ma);
+void add(bookHeader** &a1, int &n1, bookHeader** a2, int n2);
+int findBook(bookHeader** bookHeaderList, int n, bool (*con)(bookHeader*));
+void deleteBook(bookHeader** &bookHeaderList, int &n, bool (*con)(bookHeader*));
+void deleteBook(bookHeader** &bookHeaderList, int &n, int pos);
+void deleteAllBook(bookHeader** &bookHeaderList, int &n);

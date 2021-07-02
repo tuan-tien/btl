@@ -9,3 +9,4 @@ struct bookIndex {
 	bookIndex* next;
 };
 bookIndex* createBookIndex(arrList* codeBook);
+void deleteAllBookIndexNod(bookIndex* first);

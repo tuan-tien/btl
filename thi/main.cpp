@@ -307,7 +307,7 @@ void giveBookBack(dsdg* readerTree, bookHeader** bookHeaderList, int n) {
 	muonTra* temp = dg->contro;
 	while (temp) {
 		if (temp->trangThai == 0) {
-			bookHeader* b = findBook(bookHeaderList, n, temp->maSach);
+			bookHeader* b = bookHeaderList[findBook(bookHeaderList, n, temp->maSach)];
 			if (compareString(b->tenSach, tenSach) == 0) {
 				temp->trangThai = 1;
 				bookIndex* c = b->contro;
@@ -338,7 +338,7 @@ void printBookBorrowing(dsdg* readerTree, bookHeader** bookHeaderList, int n) {
 	muonTra* temp = dg->contro;
 	while (temp) {
 		if (temp->trangThai == 0) {
-			bookHeader* temp2 = findBook(bookHeaderList, n, temp->maSach);
+			bookHeader* temp2 = bookHeaderList[findBook(bookHeaderList, n, temp->maSach)];
 			cout << '\n' << temp2->ISBN << " " << temp2->tenSach << " " << temp2->soTrang << " " << temp2->tacGia << " " << temp2->theLoai << " " << temp2->namXuatBan << " " << temp->maSach;
 
 		}
@@ -478,13 +478,7 @@ void sumTop10(dsdg* readerTree, bookHeader** bookHeaderList, int n, int* arr) {
 		sumTop10(readerTree->left, bookHeaderList, n, arr);
 		muonTra* temp = readerTree->contro;
 		while (temp) {
-			bookHeader* temp2 = findBook(bookHeaderList, n, temp->maSach);
-			for (int i = 0; i < n; i++) {
-				if (bookHeaderList[i] == temp2) {
-					arr[i]++;
-					break;
-				}
-			}
+			arr[findBook(bookHeaderList, n, temp->maSach)] ++;
 			temp = temp->next;
 		}
 		sumTop10(readerTree->right, bookHeaderList, n, arr);

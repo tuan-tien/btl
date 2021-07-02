@@ -22,3 +22,11 @@ bookIndex* createBookIndex(arrList* codeBook) {
 	}
 	return first;
 }
+void deleteAllBookIndexNod(bookIndex* first) {
+	bookIndex* temp = first;
+	while (first) {
+		first = first->next;
+		delete temp;
+		temp = first;
+	}
+}
